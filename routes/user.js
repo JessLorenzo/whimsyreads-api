@@ -1,8 +1,8 @@
-import userRoutes from "./routes/users.js";
+import { postUser } from "../controllers/postUser.js";
+import express from "express";
 
-const app = express();
+const userRouter = express.Router();
 
-app.use(express.json());
-app.use("/api/users", userRoutes);
+userRouter.post("/signup", postUser);
 
-app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+export default userRouter;

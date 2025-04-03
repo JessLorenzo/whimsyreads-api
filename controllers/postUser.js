@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import mysql from "mysql2/promise";
 
 export const postUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, first_name, last_name } = req.body;
 
   if (!email || !password) {
     return res
@@ -15,7 +15,7 @@ export const postUser = async (req, res) => {
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      database: process.env.DB_DATABASE,
     });
 
     const [existing] = await connection.execute(
@@ -30,8 +30,8 @@ export const postUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const [result] = await connection.execute(
-      "INSERT INTO users (email, password) VALUES (?, ?)",
-      [email, hashedPassword]
+      "INSERT INTO users (email, password, first_name, last_name) VALUES (?, ?, ?, ?)",
+      [email, hashedPassword, first_name, last_name]
     );
 
     const newUserId = result.insertId;
