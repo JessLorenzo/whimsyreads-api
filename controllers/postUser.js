@@ -24,23 +24,34 @@ export const postUser = async (req, res) => {
     );
 
     if (existing.length > 0) {
+      await connection.end();
       return res.status(409).json({ message: "Email already registered." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const [result] = await connection.execute(
+    const [userResult] = await connection.execute(
       "INSERT INTO users (email, password, first_name, last_name) VALUES (?, ?, ?, ?)",
       [email, hashedPassword, first_name, last_name]
     );
 
-    const newUserId = result.insertId;
+    const newUserId = userResult.insertId;
+
+    const clubName = `${first_name}'s Book Club`;
+    const [clubResult] = await connection.execute(
+      "INSERT INTO book_clubs (name, user_id, created_at) VALUES (?, ?, NOW())",
+      [clubName, newUserId]
+    );
+
+    const newBookClubId = clubResult.insertId;
 
     await connection.end();
 
-    res
-      .status(201)
-      .json({ message: "User registered successfully.", user_id: newUserId });
+    res.status(201).json({
+      message: "User and book club created successfully.",
+      user_id: newUserId,
+      book_club_id: newBookClubId,
+    });
   } catch (error) {
     console.error("Signup error:", error);
     res.status(500).json({ message: "Server error during signup." });
