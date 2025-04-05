@@ -3,21 +3,21 @@ import mysql from "mysql2/promise";
 const sanitize = (value) => (value === undefined ? null : value);
 
 export const postBookClub = async (req, res) => {
+  console.log("postBookClub");
   try {
     const {
-      book_club_id,
-      user_id,
-      name,
+      bookClubId,
+      userId,
+      clubName,
       location,
-      meeting_type,
-      num_chapters,
-      meeting_frequency,
+      meetingType,
+      frequency,
       description,
-      social_link,
+      website,
       visibility,
     } = req.body;
 
-    const profilePhoto = req.file ? req.file.filename : null;
+    console.log("body", req.body);
 
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
@@ -28,25 +28,24 @@ export const postBookClub = async (req, res) => {
 
     const [result] = await connection.execute(
       `UPDATE book_clubs
-       SET name = ?, location = ?, meeting_type = ?, num_chapters = ?, meeting_frequency = ?, description = ?, social_link = ?, profile_photo = ?, visibility = ?
+       SET name = ?, location = ?, meeting_type = ?, meeting_frequency = ?, description = ?, social_link = ?, visibility = ?
        WHERE book_club_id = ? AND user_id = ?`,
+
       [
-        sanitize(name),
+        sanitize(clubName),
         sanitize(location),
-        sanitize(meeting_type),
-        sanitize(num_chapters),
-        sanitize(meeting_frequency),
+        sanitize(meetingType),
+        sanitize(frequency),
         sanitize(description),
-        sanitize(social_link),
-        sanitize(profilePhoto),
+        sanitize(website),
         sanitize(visibility),
-        sanitize(book_club_id),
-        sanitize(user_id),
+        sanitize(bookClubId),
+        sanitize(userId),
       ]
     );
-
+    console.log("result", result);
     await connection.end();
-
+    console.log("end");
     res.status(200).json({ message: "Book club profile saved successfully." });
   } catch (error) {
     console.error("Error saving book club profile:", error);

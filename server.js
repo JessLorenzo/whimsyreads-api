@@ -14,6 +14,10 @@ app.use(express.json());
 app.use("/api/bookclubs", bookClubRoutes);
 app.use("/api/users", userRouter);
 
+app.get("/", (req, res) => {
+  res.send("Whimsy Reads API is running!");
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
