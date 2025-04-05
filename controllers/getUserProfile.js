@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const getUserProfile = async (req, res) => {
-  console.log("hi");
   const userId = req.params.id;
 
   if (!userId) return res.status(400).json({ message: "User ID is required." });
@@ -27,8 +26,13 @@ export const getUserProfile = async (req, res) => {
     if (rows.length === 0) {
       return res.status(404).json({ message: "User not found." });
     }
-    console.log(rows[0]);
-    return res.status(200).json(rows[0]);
+    const user = rows[0];
+    return res.status(200).json({
+      userId: user.user_id,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      email: user.email,
+    });
   } catch (error) {
     console.error("Error fetching user profile:", error);
     return res.status(500).json({ message: "Server error fetching profile." });
